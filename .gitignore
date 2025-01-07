@@ -1,0 +1,12 @@
+﻿@"
+__pycache__/
+*.pyc
+.env
+workspace/
+venv/
+qr_bot_venv/
+*.jpeg
+*.png
+desktop.ini
+*.save
+" | Out-File -FilePath .gitignore -Encoding utf8

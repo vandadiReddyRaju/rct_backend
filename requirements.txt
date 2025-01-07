@@ -1,0 +1,5 @@
+openai
+pandas
+Pillow
+beautifulsoup4==4.12.3
+
