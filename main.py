@@ -8,7 +8,7 @@ from helpers import get_question_details_from_zip  # Removed get_question_detail
 
 # Inputs
 user_query = """<p>
-Can you help me with my mistakes.
+test cases failed, can you help me with my mistakes?
 </p>"""
 
 def get_latest_zip(downloads_folder=None):

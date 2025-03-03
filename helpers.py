@@ -6,7 +6,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 import requests
 import os
-from openai import AzureOpenAI
+from openai import AzureOpenAI, OpenAI
 from zipfile import ZipFile, BadZipFile
 import subprocess
 import re
@@ -25,29 +25,47 @@ def parse_html_to_dict(html_text):
 
     return combined_text, img_links
 
+# def llm_call(system_prompt,user_prompt):
+#     print("calling API 1")
+#     client = AzureOpenAI(
+#         azure_endpoint="https://nw-tech-chat.openai.azure.com/openai/deployments/o3-mini/chat/completions?api-version=2024-12-01-preview",
+#         api_key="...",
+#         api_version="2024-12-01-preview"
+#     )
+#     response = client.chat.completions.create(model="o3-mini", messages=[{"role": "system", "content":  system_prompt },{"role": "user", "content": user_prompt}])
+
+#     res_text = response.choices[0].message.content
+#     #print(response.usage.completion_tokens,response.usage.prompt_tokens)
+#     return res_text
+
+
 def llm_call(system_prompt, user_prompt):
-    client = AzureOpenAI(
-        azure_endpoint="...",
-        api_key="...",  # **Replace with your actual API key or use environment variables**
-        api_version="2023-03-15-preview"
+    print("calling API 1")
+    client = OpenAI(
+        api_key="",
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
     )
+
     response = client.chat.completions.create(
+        model="gemini-2.0-flash-exp",
+        n=1,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        model="gpt-4o",
-        temperature=0.0001
+            {
+                "role": "user",
+                "content": user_prompt
+            }
+        ]
     )
 
-    res_text = response.choices[0].message.content
-    return res_text
+    return (response.choices[0].message.content)
+
 
 def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
-    client = AzureOpenAI(
-        azure_endpoint="...",
-        api_key="...",  # **Replace with your actual API key or use environment variables**
-        api_version="2023-03-15-preview"
+    
+    client = OpenAI(
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        api_key=""
     )
     user_prompt_content = [{"type": "text", "text": user_prompt_text}]
     for img in user_base_64_imgs:
@@ -58,8 +76,7 @@ def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt_content}
         ],
-        model="gpt-4o",
-        temperature=0.0001
+        model="gemini-2.0-flash-exp",
     )
 
     res_text = response.choices[0].message.content
