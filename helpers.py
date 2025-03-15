@@ -82,8 +82,9 @@ def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
             ],
         )
         logging.info("ended")
-
+        
         res_text = response.choices[0].message.content
+        logging.info(res_text)
         return res_text
     except Exception as e:
         print(f"Error in llm_call_with_image: {str(e)}")
