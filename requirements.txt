@@ -10,3 +10,4 @@ gunicorn==20.1.0
 python-dotenv
 flask-cors
 werkzeug
+logging
