@@ -12,12 +12,11 @@ logging.basicConfig(
 )
 
 class QueryRouter:
-    def __init__(self, user_query, question_command_id, zip_path, question_content, question_test_cases):
-        self.query = user_query
-        self.question_command_id = question_command_id
-        self.zip_path = zip_path
-        self.question_content = question_content
-        self.question_test_cases = question_test_cases
+    def __init__(self, query):
+        self.query = query
+        self.query_text = ""
+        self.query_imgs = ""
+        self.updated_query_context = ""
 
     def parse_query(self):
         text, imgs = parse_html_to_dict(self.query)

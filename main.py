@@ -74,7 +74,7 @@ def process_request():
         # Initialize QRBot and get response
         qrbot = QRBot(
             user_query=user_query,
-            question_command_id=question_command_id,
+            question_id=question_command_id,
             zip_path=file_path,
             question_content=question_content,
             question_test_cases=question_test_cases

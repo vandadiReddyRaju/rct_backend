@@ -2,20 +2,20 @@
 
 import subprocess
 
-def run_test_case_script(container_name, question_command_id):
+def run_test_case_script(container_name, question_id):
     """
     Runs test cases inside the specified Docker container.
 
     Args:
         container_name (str): The name of the Docker container.
-        question_command_id (str): The unique identifier for the question.
+        question_id (str): The unique identifier for the question.
 
     Returns:
         dict: A dictionary containing test results.
     """
     try:
         # Example command to run tests, adjust according to your testing framework
-        test_command = f"docker exec {container_name} python /path/to/test_script.py {question_command_id}"
+        test_command = f"docker exec {container_name} python /path/to/test_script.py {question_id}"
         result = subprocess.run(test_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         
         # Parse the test results from stdout

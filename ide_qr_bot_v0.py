@@ -13,9 +13,9 @@ from prompts import (
 # Removed Agent import if not used
 
 class QRBot:
-    def __init__(self, user_query, question_command_id, zip_path="", question_content="", question_test_cases=""): 
+    def __init__(self, user_query, question_id, zip_path="", question_content="", question_test_cases=""): 
         self.user_query = user_query
-        self.question_command_id = question_command_id
+        self.question_id = question_id
         self.question_content = question_content
         self.question_test_cases = question_test_cases
         self.query_category = "other"
@@ -45,7 +45,7 @@ class QRBot:
                 return
             
             # Extract and prepare Docker environment
-            copy_folder_to_docker(self.container_id, self.zip_path, self.question_command_id)
+            copy_folder_to_docker(self.container_id, self.zip_path, self.question_id)
             self.repo_state = extract_file_contents_with_tree("./workspace", full_desc=True)
             
             # Prepare issue context
@@ -62,7 +62,7 @@ class QRBot:
                 self.bot_response = "<please_attach_code_response>"
                 return
             # Extract and prepare Docker environment
-            copy_folder_to_docker(self.container_id, self.zip_path, self.question_command_id)
+            copy_folder_to_docker(self.container_id, self.zip_path, self.question_id)
             self.repo_state = extract_file_contents_with_tree("./workspace")
             self.issue_context = f"Repo State: {self.repo_state}, Issue: {self.query_router.updated_query_context}"
             self.bot_response = llm_call(get_specific_errors_qr_v0_prompt(), self.issue_context)
@@ -84,7 +84,7 @@ class QRBot:
 
         elif "Implementation guidance" in self.query_category:
             if self.zip_path:
-                copy_folder_to_docker(self.container_id, self.zip_path, self.question_command_id)
+                copy_folder_to_docker(self.container_id, self.zip_path, self.question_id)
                 self.repo_state = extract_file_contents_with_tree("./workspace", full_desc=True)
                 question_context = self.question_content
                 self.issue_context = (
