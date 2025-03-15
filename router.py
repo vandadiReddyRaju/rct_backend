@@ -26,12 +26,12 @@ class QueryRouter:
     def classify_query(self):
         self.parse_query()
         result = llm_call_with_image(get_query_classification_prompt(),self.query_text,self.query_imgs)
-        print(type(result))
+        logging.info(result)
         start_index = result.find('{')  # Find the first '{'
         end_index = result.rfind('}') # Find the last '}'
         valid_json = result[start_index:end_index + 1]
         res_json = json.loads(valid_json)
-        print(res_json)
+        logging.info(res_json)
         if "error_description" in res_json and res_json['error_description'] != "":
             self.updated_query_context = f"Query Summary:  {res_json['user_query_summary']}, Error Description: {res_json['error_description']}"
         else :
