@@ -26,7 +26,7 @@ def get_query_classification_prompt():
     Reply in following format only and remeber to always return a valid json
     {"user_query_summary":"//Add summary here", "error_description":"//Add detailed error description here , if any error is shared by user" ,"query_category" : "//Add category here"}
 
-    Only reply with a valid json nothing else
+    Note : strictly Only reply with a valid json as mentioned in above format nothing else
 """
     return prompt
 

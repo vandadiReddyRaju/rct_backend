@@ -15,6 +15,8 @@ import pandas as pd
 import glob
 import time
 import traceback
+import logging
+
 def parse_html_to_dict(html_text):
     soup = BeautifulSoup(html_text, 'html.parser')
     text_parts = []
@@ -46,7 +48,7 @@ def llm_call(system_prompt, user_prompt):
             api_key=os.getenv("OPENROUTER_API_KEY"),  # Load API key from environment
         )
 
-    print("started")
+    logging.info("started")
     response = client.chat.completions.create(
             model="deepseek/deepseek-r1-zero:free",
             messages=[
@@ -54,7 +56,7 @@ def llm_call(system_prompt, user_prompt):
                 {"role": "user", "content": user_prompt},
             ],
         )
-    print("ended")
+    logging.info("ended")
 
     return(response.choices[0].message.content)
 
@@ -71,7 +73,7 @@ def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
             img_content = {"type": "image_url", "image_url": {"url": f"data:image/{img['extension']};base64,{img['content']}"}}
             user_prompt_content.append(img_content)
 
-        print("started")
+        logging.info("started")
         response = client.chat.completions.create(
             model="deepseek/deepseek-r1-zero:free",
             messages=[
@@ -79,7 +81,7 @@ def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
                 {"role": "user", "content": user_prompt_content},
             ],
         )
-        print("ended")
+        logging.info("ended")
 
         res_text = response.choices[0].message.content
         return res_text
@@ -218,7 +220,7 @@ def copy_folder_to_docker(container_id, zip_path, output_folder):
     try:
         with ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(workspace_dir)
-        print(f"Extracted '{zip_path}' to '{workspace_dir}'.")
+        logging.info(f"Extracted '{zip_path}' to '{workspace_dir}'.")
     except BadZipFile:
         print(f"The file '{zip_path}' is not a valid zip file.")
         return
@@ -249,7 +251,7 @@ def check_and_delete_folder(folder_path):
     if os.path.isdir(folder_path):
         try:
             shutil.rmtree(folder_path)
-            print(f"Folder '{folder_path}' has been deleted.")
+            logging.info(f"Folder '{folder_path}' has been deleted.")
             return True
         except Exception as e:
             print(f"Error occurred while deleting the folder: {e}")
