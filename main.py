@@ -51,7 +51,7 @@ def process_request():
         zip_filename = os.path.splitext(filename)[0]
         question_details = get_question_details_from_zip(zip_filename)
         if not question_details:
-            return jsonify({'error': f'No question details found for: {zip_filename}'}), 400
+            return jsonify({'response': f'No question details found for: {zip_filename}'})
 
         question_command_id = question_details['question_command_id']
         question_content = question_details['question_content']
