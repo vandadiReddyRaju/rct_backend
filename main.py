@@ -4,9 +4,12 @@ import os
 import glob
 from werkzeug.utils import secure_filename
 from ide_qr_bot_v0 import QRBot
-from copy_folder_to_docker import prepare_docker_environment
 from helpers import get_question_details_from_zip
 import traceback
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -56,11 +59,6 @@ def process_request():
         question_command_id = question_details['question_command_id']
         question_content = question_details['question_content']
         question_test_cases = question_details['question_test_cases']
-
-        # Prepare Docker environment
-        container_id = "dd5790b111f4"  # Update with your container ID or manage dynamically
-        output_folder = question_command_id
-        prepare_docker_environment(question_command_id, file_path, container_id)
 
         # Initialize QRBot and get response
         qrbot = QRBot(
