@@ -7,14 +7,14 @@ import subprocess
 import shutil
 
 def get_question_details(question_id, column_name):
-    csv_file_path = 'commands.csv' 
-    
+    csv_file_path = './commands.csv' 
+    print(type(question_id))
     try:
         df = pd.read_csv(csv_file_path)
         if column_name not in df.columns:
             print(f"Column '{column_name}' not found in the CSV.")
             return None
-        result = df[df['question_id'] == question_id]
+        result = df[df['question_command_id'] == question_id]
         
         if result.empty:
             print(f"Question ID '{question_id}' not found in the CSV.")

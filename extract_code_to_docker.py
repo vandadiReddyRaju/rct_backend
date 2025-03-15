@@ -16,7 +16,7 @@ WORKSPACE_DIR = "./workspace"  # Temporary workspace for extraction
 CHROME_PATH = "C:/Program Files/Google/Chrome/Application/chrome.exe"  # Path to Chrome
 BASE_WORKSPACE_URL = "http://localhost/#"  # Base workspace URL
 DOWNLOADS_DIR = os.path.expanduser("~/Downloads")  # Directory to look for ZIP files
-DOCKER_CONTAINER_ID = "09769941a48c"  # Replace with your Docker container ID
+DOCKER_CONTAINER_ID = "dd5790b111f4"  # Replace with your Docker container ID
 
 # Configure logging
 logging.basicConfig(

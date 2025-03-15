@@ -14,7 +14,7 @@ import shutil
 import pandas as pd
 import glob
 import time
-
+import traceback
 def parse_html_to_dict(html_text):
     soup = BeautifulSoup(html_text, 'html.parser')
     text_parts = []
@@ -42,46 +42,51 @@ def parse_html_to_dict(html_text):
 def llm_call(system_prompt, user_prompt):
     print("calling API 1")
     client = OpenAI(
-        api_key="",
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),  # Load API key from environment
+        )
 
+    print("started")
     response = client.chat.completions.create(
-        model="gemini-2.0-flash-exp",
-        n=1,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": user_prompt
-            }
-        ]
-    )
+            model="deepseek/deepseek-r1-zero:free",
+            messages=[
+                {"role": "system", "content":system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        )
+    print("ended")
 
-    return (response.choices[0].message.content)
+    return(response.choices[0].message.content)
 
 
 def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
-    
-    client = OpenAI(
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-        api_key=""
-    )
-    user_prompt_content = [{"type": "text", "text": user_prompt_text}]
-    for img in user_base_64_imgs:
-        img_content = {"type": "image_url", "image_url": {"url": f"data:image/{img['extension']};base64,{img['content']}"}}
-        user_prompt_content.append(img_content)
-    response = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt_content}
-        ],
-        model="gemini-2.0-flash-exp",
-    )
+    try:
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),  # Ensure this environment variable is set
+        )
 
-    res_text = response.choices[0].message.content
-    return res_text
+        user_prompt_content = [{"type": "text", "text": user_prompt_text}]
+        for img in user_base_64_imgs:
+            img_content = {"type": "image_url", "image_url": {"url": f"data:image/{img['extension']};base64,{img['content']}"}}
+            user_prompt_content.append(img_content)
 
+        print("started")
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-r1-zero:free",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt_content},
+            ],
+        )
+        print("ended")
+
+        res_text = response.choices[0].message.content
+        return res_text
+    except Exception as e:
+        print(f"Error in llm_call_with_image: {str(e)}")
+        traceback.print_exc()  # Print the full traceback
+        raise e  # Re-raise the exception to propagate it to the caller
 def download_image(url):
     response = requests.get(url)
     if response.status_code == 200:

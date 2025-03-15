@@ -22,7 +22,7 @@ class QRBot:
         self.repo_state = ""
         self.query_router = QueryRouter(query=self.user_query)
         self.zip_path = zip_path
-        self.container_id = "09769941a48c"  # **Update or manage dynamically as needed**
+        self.container_id = "dd5790b111f4"  # **Update or manage dynamically as needed**
         # Removed folder_location as it's no longer needed
 
     def get_bot_response(self):
@@ -32,7 +32,7 @@ class QRBot:
         print(f"Query Category: {self.query_category}")
         check_and_delete_folder("./workspace")
         self._generate_bot_response_based_on_category()
-        print(f"Bot Response: {self.bot_response}")
+        #print(f"Bot Response: {self.bot_response}")
         return self.bot_response
     
     def _generate_bot_response_based_on_category(self):

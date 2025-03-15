@@ -1,71 +1,90 @@
-# main.py
-
+from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS
 import os
 import glob
+from werkzeug.utils import secure_filename
 from ide_qr_bot_v0 import QRBot
 from copy_folder_to_docker import prepare_docker_environment
-from helpers import get_question_details_from_zip  # Removed get_question_details import
+from helpers import get_question_details_from_zip
+import traceback
 
-# Inputs
-user_query = """<p>
-test cases failed, can you help me with my mistakes?
-</p>"""
+# Initialize Flask app
+app = Flask(__name__)
 
-def get_latest_zip(downloads_folder=None):
-    if downloads_folder is None:
-        downloads_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
-    
-    list_of_zips = glob.glob(os.path.join(downloads_folder, "*.zip"))
-    if not list_of_zips:
-        raise FileNotFoundError("No zip files found in the Downloads folder.")
-        
-    latest_zip = max(list_of_zips, key=os.path.getctime)
-    filename = os.path.splitext(os.path.basename(latest_zip))[0]
-    filename = filename.replace(" (zip)", "").strip()
-    
-    print(f"Processing zip file: {filename}")
-    return latest_zip, filename
+# Enable CORS for all routes
+CORS(app)
 
-def main():
+# Configuration
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'zip'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    """Check if the file has an allowed extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/process', methods=['POST'])
+def process_request():
+    # Check if the request contains a file and a query
+    if 'file' not in request.files or 'query' not in request.form:
+        return jsonify({'error': 'Missing file or query in request'}), 400
+
+    file = request.files['file']
+    user_query = request.form['query']
+
+    # Validate the file
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed. Only ZIP files are accepted.'}), 400
+
     try:
-        latest_zip_path, zip_filename = get_latest_zip()
-        print(f"Processing file: {zip_filename}")
-        
-        # Retrieve question details from the CSV
+        # Save the uploaded file
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        # Retrieve question details from the ZIP file
+        zip_filename = os.path.splitext(filename)[0]
         question_details = get_question_details_from_zip(zip_filename)
         if not question_details:
-            print(f"No question details found for: {zip_filename}")
-            return
-        
+            return jsonify({'error': f'No question details found for: {zip_filename}'}), 400
+
         question_command_id = question_details['question_command_id']
         question_content = question_details['question_content']
         question_test_cases = question_details['question_test_cases']
-        
-        print(f"Mapped Question Command ID: {question_command_id}")
-        print(f"Question Content: {question_content}")
-        print(f"Question Test Cases: {question_test_cases}")
-        
-        container_id = "09769941a48c"  # **Update with your container ID or manage dynamically**
-        
-        # Use question_command_id as output_folder
+
+        # Prepare Docker environment
+        container_id = "dd5790b111f4"  # Update with your container ID or manage dynamically
         output_folder = question_command_id
-        
-        # Step 1: Prepare Docker environment
-        prepare_docker_environment(question_command_id, latest_zip_path, container_id)
-        
-        # Step 2: Initialize QRBot and get response
+        prepare_docker_environment(question_command_id, file_path, container_id)
+
+        # Initialize QRBot and get response
         qrbot = QRBot(
             user_query=user_query,
-            question_id=question_command_id,  # Assuming QRBot expects 'question_id' to be 'question_command_id'
-            zip_path=latest_zip_path,
+            question_id=question_command_id,
+            zip_path=file_path,
             question_content=question_content,
             question_test_cases=question_test_cases
         )
         output = qrbot.get_bot_response()
-        print(f"Bot Response: {output}")  # Or handle the output as needed
-        
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        print("Backend Output:", output)  # Debugging: Print the output
 
-if __name__ == "__main__":
-    main()
+        # Ensure the output is a valid JSON-serializable object
+        if not isinstance(output, (dict, list, str, int, float, bool)):
+            output = str(output)  # Convert to string if not JSON-serializable
+
+        # Return the bot response as JSON
+        return jsonify({'response': output})
+
+    except Exception as e:
+        # Log the full traceback for debugging
+        print(f"Error in process_request: {str(e)}")
+        traceback.print_exc()  # Print the full traceback
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
