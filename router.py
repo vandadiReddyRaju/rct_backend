@@ -33,9 +33,10 @@ class QueryRouter:
         self.parse_query()
         result = llm_call_with_image(get_query_classification_prompt(),self.query_text,self.query_imgs)
         logging.info(result)
-        start_index = result.find('{')  # Find the first '{'
-        end_index = result.rfind('}') # Find the last '}'
-        valid_json = result[start_index:end_index + 1]
+        valid_json = result.replace("\\boxed{", "").replace("}", "")
+
+        # Remove Markdown code block syntax (```json and ```)
+        valid_json = valid_json.replace("```json", "").replace("```", "")
         res_json = json.loads(valid_json)
         logging.info(res_json)
         if "error_description" in res_json and res_json['error_description'] != "":
