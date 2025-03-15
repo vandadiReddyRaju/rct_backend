@@ -4,6 +4,12 @@ import traceback
 from helpers import parse_html_to_dict
 from helpers import download_image, encode_image_to_base64, llm_call_with_image
 from prompts import get_query_classification_prompt
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 class QueryRouter:
     def __init__(self, query):
