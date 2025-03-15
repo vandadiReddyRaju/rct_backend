@@ -75,7 +75,7 @@ def llm_call_with_image(system_prompt, user_prompt_text, user_base_64_imgs):
 
         logging.info("started")
         response = client.chat.completions.create(
-            model="deepseek/deepseek-r1-zero:free",
+            model="google/gemma-3-1b-it:free",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt_content},
