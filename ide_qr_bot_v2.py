@@ -6,9 +6,9 @@ from agent import Agent
 
 
 class QRBot:
-    def __init__(self,user_query,question_id,code_link = ""): 
+    def __init__(self,user_query,question_command_id,code_link = ""): 
         self.user_query = user_query
-        self.question_id = question_id
+        self.question_command_id = question_command_id
         self.query_category = "other"
         self.repo_state = ""
         self.query_router = QueryRouter(query=self.user_query)
@@ -30,8 +30,8 @@ class QRBot:
                 return "<please_attach_code_response>"
             output_folder = download_and_extract_zip(self.code_link)
             self.repo_state = extract_file_contents_with_tree(output_folder)
-            copy_folder_to_docker("5baf109adc77",output_folder,get_question_details(self.question_id,"question_folder_location"))
-            test_case_results = run_test_case_script(self.question_id)
+            copy_folder_to_docker("5baf109adc77",output_folder,get_question_details(self.question_command_id,"question_folder_location"))
+            test_case_results = run_test_case_script(self.question_command_id)
             if len(test_case_results['failed'])==0:
                 return "<already_correct_code>" 
             print(test_case_results)
@@ -44,8 +44,8 @@ class QRBot:
             self.fixer_agent = Agent(task_desc=get_fixer_prompt(f"Developers thought : {self.final_edit_thought},Developers suggestion to which file to edit : {self.edit_agent_response}"),issue=self.query_router.updated_query_context,repo_state=self.repo_state,max_steps=10)
             self.fixer_agent_response =  self.fixer_agent.execute()
 
-            copy_folder_to_docker("5baf109adc77",output_folder,get_question_details(self.question_id,"question_folder_location"))
-            new_test_case_results = run_test_case_script(self.question_id)
+            copy_folder_to_docker("5baf109adc77",output_folder,get_question_details(self.question_command_id,"question_folder_location"))
+            new_test_case_results = run_test_case_script(self.question_command_id)
 
             if len(new_test_case_results['failed'])==0 or len(new_test_case_results['failed']) - len(new_test_case_results['failed']) >=3 :
                 return self.fixer_agent_response

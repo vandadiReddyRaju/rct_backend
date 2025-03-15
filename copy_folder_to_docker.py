@@ -6,18 +6,18 @@ from zipfile import ZipFile, BadZipFile
 import subprocess
 import shutil
 
-def get_question_details(question_id, column_name):
+def get_question_details(question_command_id, column_name):
     csv_file_path = './commands.csv' 
-    print(type(question_id))
+    print(type(question_command_id))
     try:
         df = pd.read_csv(csv_file_path)
         if column_name not in df.columns:
             print(f"Column '{column_name}' not found in the CSV.")
             return None
-        result = df[df['question_command_id'] == question_id]
+        result = df[df['question_command_id'] == question_command_id]
         
         if result.empty:
-            print(f"Question ID '{question_id}' not found in the CSV.")
+            print(f"Question ID '{question_command_id}' not found in the CSV.")
             return None
         return str(result[column_name].iloc[0])
     
@@ -69,11 +69,11 @@ def copy_folder_to_docker(container_id, input_folder, output_folder):
 
     print(f"Contents of '{input_folder}' have been copied to '{output_folder}' in container '{container_id}'")
 
-def prepare_docker_environment(question_id, zip_path, container_id):
+def prepare_docker_environment(question_command_id, zip_path, container_id):
     # Get folder location from CSV
-    folder = get_question_details(question_id, "question_folder_location")
+    folder = get_question_details(question_command_id, "question_folder_location")
     if not folder:
-        print(f"Could not find folder location for question ID: {question_id}")
+        print(f"Could not find folder location for question ID: {question_command_id}")
         return
     
     # Clean workspace
