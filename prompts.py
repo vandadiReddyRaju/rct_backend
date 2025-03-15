@@ -24,7 +24,7 @@ def get_query_classification_prompt():
     Remeber the github and git issues should be classified in Conceptual doubts category instead of Code publishing issue category
     Make sure you don't miss any critical detail in summarizing the user query and be as thorough as possible, and also add a valid and detailed decription of error like if its present. Don't add any explnation or solution for error add error description as per what user has shared  and be extremely careful and classify the query accurately in one of the categories, if you're confused then classify into <Other> category .
     Reply in following format only and remeber to always return a valid json
-    {"user_query_summary":"//Add summary here", "error_description":"//Add detailed error description here , if any error is shared by user" ,"query_category" : "//Add category here"}
+    {"user_query_summary":"//Add summary here", "error_description":"//Add detailed error description in more detail and and proper way here , if any error is shared by user" ,"query_category" : "//Add category here"}
 
     Note : strictly Only reply with a valid json as mentioned in above format nothing else
 """

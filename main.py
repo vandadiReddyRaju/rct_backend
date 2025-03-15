@@ -7,6 +7,12 @@ from ide_qr_bot_v0 import QRBot
 from helpers import get_question_details_from_zip
 import traceback
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -74,7 +80,7 @@ def process_request():
             question_test_cases=question_test_cases
         )
         output = qrbot.get_bot_response()
-        print("Backend Output:", output)  # Debugging: Print the output
+        logging.info(f"Backend Output: {output}")  # Debugging: Print the output
 
         # Ensure the output is a valid JSON-serializable object
         if not isinstance(output, (dict, list, str, int, float, bool)):
